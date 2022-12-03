@@ -15,15 +15,17 @@ def clean_book_name(book: str) -> str:
 
 
 def get_components_from_highlight(highlight: str) -> list[str]:
-    return list(filter(lambda item: len(item) > 0,highlight.split("\n")))
+    return list(filter(lambda item: len(item) > 0, highlight.split("\n")))
 
 
-def parse_raw_clippings_to_csv_format(source_file: str, encoding: str = "utf-8")  -> None:
+def parse_raw_clippings_to_csv_format(
+    source_file: str, encoding: str = "utf-8"
+) -> None:
 
     if not os.path.isfile(source_file):
         raise IOError("Error: cannot find " + source_file)
 
-    df = pd.DataFrame(columns=[BOOKNAME_COL,DATE_COL,CLIP_COL])
+    df = pd.DataFrame(columns=[BOOKNAME_COL, DATE_COL, CLIP_COL])
 
     with io.open(source_file, "r", encoding=encoding, errors="ignore") as f:
         highlights_str = f.read()
@@ -33,23 +35,26 @@ def parse_raw_clippings_to_csv_format(source_file: str, encoding: str = "utf-8")
             if len(lines) != 3:
                 print("Error ON LINE: ", lines)
                 continue
-            book, dateinfo, cliptext, = lines
+            (
+                book,
+                dateinfo,
+                cliptext,
+            ) = lines
 
             book = clean_book_name(book)
 
             print(book, cliptext[:50])
 
-            df.loc[len(df),:] = [book, dateinfo, cliptext]
+            df.loc[len(df), :] = [book, dateinfo, cliptext]
 
-        df.to_csv(CSVNAME, index=False)
-
+        df.to_csv(KINDLE_CLIPPINGS_CSV, index=False)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Transform kindle clippings into a nice CSV file"
     )
-    parser.add_argument("-file_path", type=str, default="./My Clippings.txt")
+    parser.add_argument("-file_path", type=str, default="./My Clippings Example.txt")
     parser.add_argument("-encoding", type=str, default="utf-8")
     args = parser.parse_args()
 

@@ -1,5 +1,7 @@
-CSVNAME = "kindle_clippings.csv"
+KINDLE_CLIPPINGS_CSV = "kindle_clippings.csv"
 
-BOOKNAME_COL = 'book'
-DATE_COL = 'date'
-CLIP_COL = 'clip'
+BOOKNAME_COL = "book"
+DATE_COL = "date"
+CLIP_COL = "clip"
+API_TOKEN_PUSHOVER = "API_TOKEN_PUSHOVER"
+USER_KEY_PUSHOVER = "USER_KEY_PUSHOVER"
