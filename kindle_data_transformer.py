@@ -5,7 +5,7 @@ import argparse
 
 import pandas as pd
 
-from helperutils import *
+from helperutils import BOOKNAME_COL, DATE_COL, CLIP_COL, KINDLE_CLIPPINGS_CSV
 
 
 def clean_book_name(book: str) -> str:

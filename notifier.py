@@ -1,29 +1,25 @@
-import dataclasses
 import os
 import random
 import time
-import requests
+import requests as requests
 from dotenv import load_dotenv
 
-import pandas as pd
-from pandas import DataFrame
-
-from helperutils import *
-
-
-@dataclasses.dataclass
-class Clipping:
-    book: str
-    date: str
-    text: str
+from models import Clipping
+from helperutils import (
+    API_TOKEN_PUSHOVER,
+    USER_KEY_PUSHOVER,
+    KINDLE_CLIPPINGS_CSV,
+    read_clippings,
+)
 
 
 class MessageSender:
-    def __init__(self, notes: DataFrame):
+    def __init__(self, notes: list[Clipping]):
         self.notes = notes
 
     def send_clipping_to_notification_service(self, clipping: Clipping) -> None:
         message = self._create_notification_message(clipping)
+        print(API_TOKEN_PUSHOVER)
         r = requests.post(
             "https://api.pushover.net/1/messages.json",
             data={
@@ -39,24 +35,19 @@ class MessageSender:
 
     def start_sending(self):
         while True:
-            random_clipping = self._get_random_clipping(self.notes)
-            self.send_clipping_to_notification_service(random_clipping)
+            self.send_single_message()
             time.sleep(10)
 
-    def _get_random_clipping(self, notes_dataframe: DataFrame) -> Clipping:
-        random_number = random.randint(0, len(notes_dataframe))
-        clipping = notes_dataframe.iloc[random_number]
-        book, date, text = (
-            clipping[BOOKNAME_COL],
-            clipping[DATE_COL],
-            clipping[CLIP_COL],
-        )
-        clipping = Clipping(book, date, text)
-        return clipping
+    def send_single_message(self):
+        random_clipping = self._get_random_clipping(self.notes)
+        self.send_clipping_to_notification_service(random_clipping)
+
+    def _get_random_clipping(self, clippings: list[Clipping]) -> Clipping:
+        return random.choice(clippings)
 
 
 if __name__ == "__main__":
     load_dotenv()
-    notes: DataFrame = pd.read_csv(KINDLE_CLIPPINGS_CSV)
+    notes: list[Clipping] = read_clippings(KINDLE_CLIPPINGS_CSV)
     msender = MessageSender(notes)
     msender.start_sending()
